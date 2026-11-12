@@ -1,0 +1,34 @@
+
+name: Create Admin User
+
+on:
+  workflow_dispatch:
+
+jobs:
+  create-admin:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        working-directory: backend
+        run: pip install -r requirements.txt
+
+      - name: Create Admin
+        working-directory: backend
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+        run: |
+          echo "::add-mask::$ADMIN_PASSWORD"
+          python seed_admin.py \
+            --email admin@simple.dev \
+            --password "$ADMIN_PASSWORD" \
+            --name "MY ROCKET XPRESS Admin"
